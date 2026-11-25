@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Santo Rosario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: tierno, recogido, sereno; pocas palabras, mucho aire.
+   IDEA: un rosario real en la mano: cada toque pasa una cuenta.
+   PICTURE: el rosario completo en SVG, la cuenta actual encendida en rosa.
+   COLOUR and TYPE: azul mariano profundo + blanco + rosa; EB Garamond para las oraciones, Figtree para controles.
+   LAYOUT: banda azul con el rosario, tarjeta de oración debajo (o al lado en pantallas anchas), botones fijos abajo. */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0a1230);--ink:light-dark(#14203f,#e9eefb);--soft:light-dark(#5a6785,#9fb0d6);--line:light-dark(#e3e8f3,#22305e);--blue:light-dark(#1a3473,#12215a);--rose:light-dark(#d63a6f,#f06b98);--chip:light-dark(#eef2fa,#16234f);--wash:light-dark(#fdf0f4,#1c1f4a);--ps:20px}
+:root[data-set=goz]{--blue:#6e1d40;--rose:light-dark(#d63a6f,#f06b98)}
+:root[data-set=dol]{--blue:#4a0f1c;--rose:light-dark(#b8323a,#f0716f)}
+:root[data-set=lum]{--blue:#4a3510;--rose:light-dark(#b07415,#e9b14a)}
+:root[data-set=glo]{--blue:#15306b;--rose:light-dark(#b8861c,#e8bd52)}
+:root{--wash:color-mix(in srgb,var(--rose) 9%,var(--bg))}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+body,.panel,.nav{transition:background-color .5s}
+.card.in-f>*{animation:inF .38s cubic-bezier(.2,.7,.2,1) both}.card.in-b>*{animation:inB .38s cubic-bezier(.2,.7,.2,1) both}
+.card>*:nth-child(2){animation-delay:.04s}.card>*:nth-child(3){animation-delay:.08s}
+@keyframes inF{from{opacity:0;transform:translateX(22px)}}@keyframes inB{from{opacity:0;transform:translateX(-22px)}}
+.hero{text-align:center;padding:4px 0 10px}.hero h2{margin:8px 0 4px;font-size:40px}
+.emb{width:112px;height:112px;display:block;margin:0 auto}
+.sub{font:italic 400 19px/1.3 "EB Garamond",serif;color:var(--soft);margin:0}
+.mlist{list-style:none;padding:0;margin:0 0 18px;display:grid;gap:8px}
+.mlist button{width:100%;display:flex;align-items:center;gap:14px;text-align:start;min-height:56px;padding:10px 14px;border-radius:14px;border:1px solid var(--line);background:var(--bg);font:500 16px/1.3 Figtree,sans-serif;transition:border-color .2s,background .2s}
+.mlist button:hover{border-color:var(--rose);background:var(--wash)}
+.mlist b{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--rose);color:#fff;font-weight:700}
+.int{width:100%;min-height:50px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:16px Figtree,sans-serif}
+.intent{font:italic 19px/1.4 "EB Garamond",serif;color:var(--soft)}
+.nav button:active{transform:scale(.98)}
+.quote p{font-family:"EB Garamond",serif}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Figtree,system-ui,sans-serif;overflow-x:clip}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--rose);outline-offset:2px}
+.prog{height:4px;background:var(--line)}.prog i{display:block;height:100%;width:0;background:var(--rose);transition:width .3s}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px max(4vw,16px)}
+h1{font:600 30px/1.05 "EB Garamond",serif;margin:0}
+.day{color:var(--soft);font-size:14px;margin:2px 0 0}
+.frase{font:italic 400 16px/1.35 "EB Garamond",serif;margin:6px 0 0;max-width:52ch}.frase small{font:500 12px Figtree,sans-serif;color:var(--soft);font-style:normal;white-space:nowrap}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr)}
+.panel{background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--rose) 38%,var(--blue)) 0,var(--blue) 68%);display:flex;align-items:center;justify-content:center;padding:14px;height:32vh;min-height:210px;max-height:300px}
+.panel svg{height:100%;width:auto;max-width:100%;overflow:visible}
+.bead{cursor:pointer;transition:opacity .25s}
+.bead.up{opacity:.42}
+.bead.cur{fill:color-mix(in srgb,var(--rose) 40%,#fff)!important;filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 2px var(--rose))}
+.ring{fill:none;stroke:#ffd0e0;stroke-width:2;opacity:0;pointer-events:none}
+.ring.on{opacity:1;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{50%{stroke-opacity:.25}}
+.card{padding:22px max(5vw,18px) 120px;max-width:760px;width:100%;margin:0 auto}
+.meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--soft);font-size:14px;font-weight:500}
+.dots{display:flex;gap:5px}.dots b{width:9px;height:9px;border-radius:50%;background:var(--line)}.dots b.f{background:var(--rose)}
+h2{font:600 34px/1.05 "EB Garamond",serif;margin:6px 0 14px;text-wrap:balance}
+.txt{font:400 var(--ps)/1.5 "EB Garamond",serif;max-width:62ch}
+.txt p{margin:0 0 .7em}
+.txt hr{border:0;border-top:1px solid var(--line);margin:1em 0}
+.lbl{font:600 14px Figtree,sans-serif;color:var(--rose);margin:0 0 .3em!important}
+.myst{font-size:1.3em;font-weight:600;color:var(--rose);line-height:1.2}
+.quote{background:var(--wash);border-radius:14px;padding:14px 16px;margin:0 0 1em}
+.quote p{font-style:italic;margin:0}.quote .cite{font-style:normal;color:var(--soft);font-size:.8em;margin-top:6px}
+.cite{color:var(--soft)}
+.fruto{font:500 15px Figtree,sans-serif;color:var(--soft)}
+.lit{list-style:none;padding:0;margin:0}.lit li{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--line)}
+.lit li span{color:var(--soft);font-style:italic}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;padding:12px max(4vw,16px) calc(12px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line);z-index:5}
+.nav button{min-height:54px;border-radius:14px;border:1px solid var(--line);background:var(--chip);font-weight:600;font-size:17px}
+#prev{flex:1}#next{flex:2.4;background:var(--rose);border-color:var(--rose);color:#fff}
+#prev:disabled{opacity:.4;cursor:default}
+details.set{position:relative;flex:none}
+summary{list-style:none;min-height:44px;display:flex;align-items:center;padding:0 16px;border-radius:12px;background:var(--chip);font-weight:600;font-size:15px;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+.sheet{position:absolute;right:0;top:52px;width:min(350px,92vw);max-height:75vh;overflow-y:auto;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:16px;z-index:10;box-shadow:0 12px 40px rgba(10,18,48,.25)}
+.sheet h3{font-size:13px;color:var(--soft);font-weight:600;margin:14px 0 6px}.sheet h3:first-child{margin-top:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{min-height:44px;padding:0 14px;border-radius:22px;border:1px solid var(--line);background:var(--chip);font-size:15px}
+.chips button[aria-pressed=true]{background:var(--rose);border-color:var(--rose);color:#fff}
+.tog{display:flex;align-items:center;gap:10px;min-height:44px;font-size:15px;line-height:1.3}
+.tog input{width:22px;height:22px;flex:none;accent-color:var(--rose)}
+.done{text-align:center;padding-top:20px}.done .quote{text-align:start}
+@media(min-width:820px){
+ .wrap{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}
+ .panel{max-height:none;position:sticky;top:0;align-self:start;height:calc(100vh - 170px)}
+ .card{padding-top:40px}
+ h2{font-size:44px}
+}
+@media(prefers-reduced-motion:reduce){.ring.on{animation:none}.prog i,.bead{transition:none}}
+</style>
+</head>
+<body>
+<div class="prog"><i id="bar"></i></div>
+<header>
+ <div><h1>Santo Rosario</h1><p class="day" id="day"></p></div>
+ <details class="set" id="set">
+  <summary>Ajustes</summary>
+  <div class="sheet">
+   <h3>Misterios</h3>
+   <div class="chips" id="sets"></div>
+   <h3>Después de cada decena</h3>
+   <label class="tog"><input type="checkbox" id="fat"> Oración de Fátima</label>
+   <div id="jacs"></div>
+   <h3>Al final del Rosario</h3>
+   <label class="tog"><input type="checkbox" id="lit"> Letanías de la Virgen</label>
+   <label class="tog"><input type="checkbox" id="mig"> Oración a San Miguel Arcángel</label>
+   <h3>Tamaño del texto</h3>
+   <div class="chips"><button id="tm" aria-label="Texto más pequeño">A−</button><button id="tp" aria-label="Texto más grande">A+</button></div>
+   <h3>Rosario</h3>
+   <div class="chips"><button id="reset">Empezar de nuevo</button></div>
+  </div>
+ </details>
+</header>
+<div class="wrap">
+ <div class="panel"><svg id="ros" viewBox="0 0 300 480" role="img" aria-label="Rosario: la cuenta encendida es la oración actual. Toca una cuenta para ir a ella."></svg></div>
+ <main class="card" id="card" aria-live="polite"></main>
+</div>
+<nav class="nav"><button id="prev">Anterior</button><button id="next">Siguiente</button></nav>
+
+<script>
+{
+const P={
+senal:"Por la señal de la Santa Cruz, de nuestros enemigos líbranos, Señor, Dios nuestro.\nEn el nombre del Padre, y del Hijo, y del Espíritu Santo. Amén.",
+credo:"Creo en Dios, Padre todopoderoso, Creador del cielo y de la tierra.\nCreo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo, nació de Santa María Virgen, padeció bajo el poder de Poncio Pilato, fue crucificado, muerto y sepultado, descendió a los infiernos, al tercer día resucitó de entre los muertos, subió a los cielos y está sentado a la derecha de Dios, Padre todopoderoso. Desde allí ha de venir a juzgar a vivos y muertos.\nCreo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.",
+pn:"Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo.\nDanos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal. Amén.",
+am:"Dios te salve, María, llena eres de gracia, el Señor es contigo. Bendita tú eres entre todas las mujeres, y bendito es el fruto de tu vientre, Jesús.\nSanta María, Madre de Dios, ruega por nosotros, pecadores, ahora y en la hora de nuestra muerte. Amén.",
+gloria:"Gloria al Padre, y al Hijo, y al Espíritu Santo.\nComo era en el principio, ahora y siempre, por los siglos de los siglos. Amén.",
+fatima:"Oh Jesús mío, perdona nuestros pecados, líbranos del fuego del infierno, lleva al cielo a todas las almas, y socorre especialmente a las más necesitadas de tu misericordia. Amén.",
+salve:"Dios te salve, Reina y Madre de misericordia, vida, dulzura y esperanza nuestra; Dios te salve.\nA ti llamamos los desterrados hijos de Eva; a ti suspiramos, gimiendo y llorando en este valle de lágrimas.\nEa, pues, Señora, abogada nuestra, vuelve a nosotros esos tus ojos misericordiosos; y después de este destierro muéstranos a Jesús, fruto bendito de tu vientre.\n¡Oh clementísima, oh piadosa, oh dulce Virgen María!",
+final:"℣. Ruega por nosotros, santa Madre de Dios.\n℟. Para que seamos dignos de alcanzar las promesas de nuestro Señor Jesucristo.\nOremos: Oh Dios, cuyo Hijo unigénito, con su vida, muerte y resurrección, nos alcanzó el premio de la vida eterna; concédenos, te rogamos, que meditando estos misterios del santísimo Rosario de la Virgen María, imitemos lo que contienen y alcancemos lo que prometen. Por el mismo Cristo nuestro Señor. Amén.",
+miguel:"San Miguel Arcángel, defiéndenos en la lucha; sé nuestro amparo contra la perversidad y asechanzas del demonio.\nReprímale Dios, pedimos suplicantes; y tú, Príncipe de la milicia celestial, arroja al infierno con el divino poder a Satanás y a los otros espíritus malignos que andan dispersos por el mundo para la perdición de las almas. Amén."
+};
+const JAC=[
+"María, Madre de gracia, Madre de misericordia, en la vida y en la muerte ampáranos, oh gran Señora.",
+"Ave María Purísima. — Sin pecado concebida.",
+"Sagrado Corazón de Jesús, en vos confío.",
+"Dulce Corazón de María, sed la salvación mía.",
+"Jesús, José y María, os doy el corazón y el alma mía."
+];
+const KY=[["Señor, ten piedad","Señor, ten piedad"],["Cristo, ten piedad","Cristo, ten piedad"],["Señor, ten piedad","Señor, ten piedad"],["Cristo, óyenos","Cristo, óyenos"],["Cristo, escúchanos","Cristo, escúchanos"],["Dios, Padre celestial","ten piedad de nosotros"],["Dios Hijo, Redentor del mundo","ten piedad de nosotros"],["Dios Espíritu Santo","ten piedad de nosotros"],["Santísima Trinidad, un solo Dios","ten piedad de nosotros"]];
+const LM="Santa María|Santa Madre de Dios|Santa Virgen de las vírgenes|Madre de Cristo|Madre de la Iglesia|Madre de la misericordia|Madre de la divina gracia|Madre de la esperanza|Madre purísima|Madre castísima|Madre siempre virgen|Madre inmaculada|Madre amable|Madre admirable|Madre del buen consejo|Madre del Creador|Madre del Salvador|Virgen prudentísima|Virgen digna de veneración|Virgen digna de alabanza|Virgen poderosa|Virgen clemente|Virgen fiel|Espejo de justicia|Trono de la sabiduría|Causa de nuestra alegría|Vaso espiritual|Vaso digno de honor|Vaso de insigne devoción|Rosa mística|Torre de David|Torre de marfil|Casa de oro|Arca de la alianza|Puerta del cielo|Estrella de la mañana|Salud de los enfermos|Refugio de los pecadores|Consuelo de los migrantes|Consoladora de los afligidos|Auxilio de los cristianos|Reina de los ángeles|Reina de los patriarcas|Reina de los profetas|Reina de los apóstoles|Reina de los mártires|Reina de los confesores|Reina de las vírgenes|Reina de todos los santos|Reina concebida sin pecado original|Reina asunta a los cielos|Reina del santísimo Rosario|Reina de la familia|Reina de la paz".split("|");
+const AG=["perdónanos, Señor","escúchanos, Señor","ten misericordia de nosotros"];
+
+/* Frase del día: cambia cada día */
+const FR=[
+["Hagan lo que él les diga.","Jn 2, 5"],
+["Proclama mi alma la grandeza del Señor, se alegra mi espíritu en Dios, mi salvador.","Lc 1, 46-47"],
+["Vengan a mí todos los que están cansados y agobiados, y yo los aliviaré.","Mt 11, 28"],
+["El Señor es mi pastor, nada me falta.","Sal 23, 1"],
+["No temas, que yo estoy contigo; no te angusties, que yo soy tu Dios.","Is 41, 10"],
+["Dios es amor.","1 Jn 4, 8"],
+["Pidan y se les dará; busquen y encontrarán; llamen y se les abrirá.","Mt 7, 7"],
+["Solo en Dios descansa mi alma, de él viene mi salvación.","Sal 62, 2"],
+["Ahí tienes a tu madre.","Jn 19, 27"],
+["El Rosario es mi oración predilecta. ¡Plegaria maravillosa! Maravillosa en su sencillez y en su profundidad.","San Juan Pablo II"],
+["Bendita tú entre las mujeres, y bendito el fruto de tu vientre.","Lc 1, 42"],
+["Yo soy la luz del mundo; el que me sigue no caminará en tinieblas.","Jn 8, 12"],
+["Todo lo puedo en aquel que me fortalece.","Flp 4, 13"],
+["Gusten y vean qué bueno es el Señor.","Sal 34, 9"],
+["Permanezcan en mi amor.","Jn 15, 9"],
+["Te basta mi gracia, porque mi fuerza se realiza en la debilidad.","2 Co 12, 9"],
+["Estén siempre alegres en el Señor; se lo repito, estén alegres.","Flp 4, 4"],
+["Dichosos los limpios de corazón, porque ellos verán a Dios.","Mt 5, 8"],
+["Señor, ¿a quién iremos? Tú tienes palabras de vida eterna.","Jn 6, 68"],
+["Él sana a los de corazón quebrantado y venda sus heridas.","Sal 147, 3"],
+["Nada te turbe, nada te espante; todo se pasa, Dios no se muda. Quien a Dios tiene nada le falta: solo Dios basta.","Santa Teresa de Jesús"]
+];
+
+/* Misterios: [nombre, fruto, [[cita, referencia, para meditar] × 3]] — la meditación cambia cada día */
+const M={
+goz:{n:"Gozosos",adj:"gozoso",l:[
+["La Anunciación del Ángel a María","la humildad",[
+["Aquí está la esclava del Señor; hágase en mí según tu palabra.","Lc 1, 38","María no lo entendía todo, y aun así dijo sí. Su fe no fue la ausencia de preguntas, sino una confianza más grande que ellas. Dios sigue llamando a la puerta de tu vida en lo pequeño: un deber, una persona, una cruz. Pídele a María un corazón disponible, que no le ponga condiciones al amor."],
+["Alégrate, llena de gracia, el Señor está contigo.","Lc 1, 28","La primera palabra de Dios a María es una invitación a la alegría. Antes de pedirle nada, le recuerda que no está sola. Escucha hoy esas mismas palabras dirigidas a ti: el Señor está contigo, también en aquello que te pesa y que nadie más ve."],
+["Para Dios nada hay imposible.","Lc 1, 37","Lo que parecía imposible —que Dios se hiciera niño en el seno de una joven de Nazaret— comenzó en el silencio de una casa humilde. Dios obra sus mayores maravillas sin ruido. Entrégale aquello que crees que ya no tiene solución y deja que Él escriba el resto de la historia."]]],
+["La Visitación de María a su prima Isabel","la caridad con el prójimo",[
+["Apenas llegó a mis oídos tu saludo, el niño saltó de alegría en mi vientre.","Lc 1, 44","María, apenas recibe a Jesús, sale de prisa a servir. Quien lleva a Dios dentro no se encierra: se pone en camino. Piensa en quién necesita hoy tu visita, tu llamada o tu tiempo. Allí donde llegas con amor, llevas a Cristo contigo."],
+["Proclama mi alma la grandeza del Señor.","Lc 1, 46","María no habla de sí misma, sino de lo que Dios ha hecho. Su canto nace de un corazón agradecido que sabe leer la propia historia con los ojos de la fe. Haz memoria de los favores que has recibido, y deja que tu oración de hoy sea, ante todo, gratitud."],
+["Dichosa tú, que has creído.","Lc 1, 45","Isabel descubre la verdadera grandeza de María: haber creído. La fe compartida une a estas dos mujeres y hace saltar de gozo al niño en el vientre. Cuando la fe se comparte, la alegría se multiplica. Pide por tu familia y por quienes caminan contigo hacia Dios."]]],
+["El Nacimiento del Hijo de Dios en Belén","la pobreza de espíritu",[
+["Hoy les ha nacido un Salvador, que es el Mesías, el Señor.","Lc 2, 11","Dios no eligió un palacio, sino un pesebre. El Todopoderoso se hizo pequeño para que nadie tuviera miedo de acercarse a Él. Contempla al Niño en brazos de María y deja que su pobreza te enseñe a desprenderte de lo que sobra y a valorar lo esencial."],
+["Lo acostó en un pesebre, porque no había lugar para ellos en la posada.","Lc 2, 7","También hoy Jesús busca un lugar donde nacer: un corazón con espacio. Pregúntate qué ocupa tanto tu interior que no le deja sitio. María y José lo recibieron de noche, con lo poco que tenían, y con eso bastó. Ofrécele lo que eres, tal como estás."],
+["María conservaba todas estas cosas, meditándolas en su corazón.","Lc 2, 19","María no lo comprendía todo, pero lo guardaba. Así nace la oración: mirar a Jesús en silencio y dejar que su presencia ilumine poco a poco lo que vivimos. Rezar el Rosario es aprender a mirar a Cristo con los ojos de su Madre."]]],
+["La Presentación de Jesús en el Templo","la obediencia y la pureza",[
+["Mis ojos han visto tu salvación.","Lc 2, 30","Simeón esperó toda su vida, y su paciencia no fue defraudada. Dios cumple sus promesas, aunque no siempre a nuestro ritmo. Pon en sus manos lo que esperas desde hace tiempo y pídele la paz de quien sabe que Él llega a su hora, nunca tarde."],
+["Y a ti misma una espada te atravesará el alma.","Lc 2, 35","En medio de la alegría, María recibe un anuncio de dolor. No huye: lo acepta y lo guarda junto a Jesús. Ofrece hoy tus preocupaciones como ella ofreció a su Hijo, sabiendo que nada de lo que se entrega a Dios se pierde."],
+["Llevaron al niño a Jerusalén para presentarlo al Señor.","Lc 2, 22","María y José ofrecen lo que pueden: un par de tórtolas, la ofrenda de los pobres. A Dios no le importa el tamaño del regalo, sino el corazón que lo da. Preséntale hoy tu trabajo, tu cansancio y a los tuyos; en sus manos todo se vuelve ofrenda."]]],
+["El Niño Jesús perdido y hallado en el Templo","buscar a Dios en todas las cosas",[
+["¿No sabían que yo debo ocuparme de las cosas de mi Padre?","Lc 2, 49","Jesús revela a los doce años la razón de su vida: el Padre. Todo lo demás encuentra su lugar cuando Dios ocupa el primero. Revisa tus prioridades con sinceridad y pídele a María que te ayude a poner a Dios en el centro de tus días."],
+["Tu padre y yo te buscábamos angustiados.","Lc 2, 48","Hay momentos en que Dios parece ausente. María y José no se rinden: lo buscan durante tres días hasta encontrarlo. Si hoy sientes a Dios lejos, no dejes de buscar; Él se deja encontrar en su casa, en su Palabra y en la Eucaristía."],
+["Jesús crecía en sabiduría, en estatura y en gracia ante Dios y ante los hombres.","Lc 2, 52","Treinta años de vida escondida en Nazaret: trabajo, familia, obediencia. Así santificó Jesús lo ordinario. Tu casa y tu oficio pueden ser tu Nazaret, el lugar donde, sin que nadie lo note, creces en gracia haciendo bien lo de cada día."]]]
+]},
+lum:{n:"Luminosos",adj:"luminoso",l:[
+["El Bautismo de Jesús en el Jordán","la fidelidad a nuestro bautismo",[
+["Tú eres mi Hijo amado, en ti me complazco.","Mc 1, 11","Antes de cualquier milagro o predicación, el Padre declara su amor. Tu identidad más profunda tampoco depende de tus logros ni de tus caídas: por el bautismo eres hijo amado de Dios. Descansa hoy en esa verdad y vive desde ella."],
+["Conviene que cumplamos así toda justicia.","Mt 3, 15","Jesús, que no tenía pecado, se pone en la fila de los pecadores. No nos salva desde lejos, sino haciéndose uno de nosotros. Pídele un corazón humilde que no se sienta superior a nadie y que sepa acompañar a quien carga con sus faltas."],
+["Vio que los cielos se abrían y el Espíritu bajaba sobre él como una paloma.","Mc 1, 10","En el Jordán el cielo se abre y la Trinidad se manifiesta. Lo mismo ocurrió el día de tu bautismo, aunque no lo recuerdes. Renueva en silencio tus promesas: renunciar al mal y creer en Dios, que te llamó por tu nombre."]]],
+["La autorrevelación de Jesús en las Bodas de Caná","la confianza en la intercesión de María",[
+["Hagan lo que él les diga.","Jn 2, 5","Son las últimas palabras de María en el Evangelio, y resumen toda su vida: llevarnos a Jesús. Ella no se pone en el centro, señala a su Hijo. Escucha hoy ese consejo de Madre y pregúntate qué te está pidiendo el Señor que todavía no has hecho."],
+["No tienen vino.","Jn 2, 3","María se da cuenta de la necesidad antes que nadie y la presenta a Jesús con discreción. Así intercede por ti, incluso por lo que no te atreves a pedir. Dile hoy a la Virgen qué te falta en casa, en el trabajo o en el alma."],
+["Tú has guardado el vino bueno hasta ahora.","Jn 2, 10","Jesús transforma el agua de las tinajas en el mejor vino. Toma lo sencillo de tu vida y lo convierte en fiesta cuando lo pones en sus manos. Con Dios, lo mejor no queda atrás: siempre está por llegar."]]],
+["El anuncio del Reino de Dios invitando a la conversión","la conversión del corazón",[
+["El tiempo se ha cumplido y el Reino de Dios está cerca: conviértanse y crean en el Evangelio.","Mc 1, 15","Convertirse no es solo dejar el pecado: es volver el rostro hacia Dios, que nos espera con los brazos abiertos. Cada día es una nueva oportunidad. Elige hoy un paso concreto que te acerque a Él y a los demás."],
+["Dichosos los pobres de espíritu, porque de ellos es el Reino de los cielos.","Mt 5, 3","El Reino de Dios no pertenece a los que lo tienen todo resuelto, sino a quienes se saben necesitados. Reconocer tu pequeñez no es humillación: es la puerta de la alegría. Pide la gracia de depender de Dios con confianza de niño."],
+["Hijo, tus pecados te son perdonados.","Mc 2, 5","Jesús anuncia el Reino sanando y perdonando. Su misericordia es más grande que cualquier culpa. Si llevas algo que te pesa, este misterio te invita a acercarte al sacramento de la Reconciliación y a dejar que Él te levante."]]],
+["La Transfiguración del Señor","el deseo de santidad",[
+["Este es mi Hijo amado; escúchenlo.","Mc 9, 7","En el monte, el Padre da una sola instrucción: escuchar a Jesús. En medio de tantas voces que nos reclaman, su Palabra es la que da luz. Regálale hoy unos minutos de silencio al Evangelio y deja que te hable."],
+["Señor, ¡qué bien se está aquí!","Mt 17, 4","Dios nos regala momentos de consuelo para fortalecernos en el camino. Pero no podemos quedarnos en el monte: hay que bajar y amar en lo cotidiano. Agradece los momentos de luz que has vivido y llévalos a quienes te rodean."],
+["Levántense, no tengan miedo.","Mt 17, 7","Los discípulos caen por tierra, asustados, y Jesús se acerca, los toca y los levanta. La gloria que vieron los preparaba para la cruz que vendría. Cuando el miedo te paralice, recuerda que Jesús sigue acercándose para decirte: no temas."]]],
+["La institución de la Eucaristía","el amor a la Eucaristía",[
+["Tomen y coman: esto es mi cuerpo.","Mt 26, 26","La noche antes de morir, Jesús se entrega para quedarse. No nos dejó solo un recuerdo, sino su presencia real. Cada Misa es ese mismo amor que se ofrece por ti. Pide la gracia de recibirlo con fe, con hambre y con gratitud."],
+["Hagan esto en memoria mía.","Lc 22, 19","Jesús confía a sus amigos el tesoro más grande. Recordar, para Dios, es hacer presente. Piensa cómo vives la Eucaristía: ¿es costumbre o encuentro? Ofrece hoy este misterio por los sacerdotes que hacen posible su presencia en el altar."],
+["Habiendo amado a los suyos que estaban en el mundo, los amó hasta el extremo.","Jn 13, 1","La Eucaristía es el amor que no se guarda nada. Quien comulga aprende a partirse y a darse como pan para los demás. Pregúntate a quién puedes entregarle hoy un poco de tu tiempo, tu paciencia o tu ternura."]]]
+]},
+dol:{n:"Dolorosos",adj:"doloroso",l:[
+["La Oración de Jesús en el Huerto","el arrepentimiento de los pecados",[
+["Padre, si quieres, aparta de mí este cáliz; pero que no se haga mi voluntad, sino la tuya.","Lc 22, 42","Jesús siente miedo y angustia, y no lo esconde: lo lleva a la oración. Ahí encuentra la fuerza para abandonarse en el Padre. Tú también puedes llevarle tus miedos sin disfrazarlos y aprender a decir, con Él: hágase tu voluntad."],
+["Mi alma está triste hasta la muerte; quédense aquí y velen conmigo.","Mt 26, 38","El Hijo de Dios pide compañía en su hora más oscura. Sus amigos se duermen. Hoy puedes acompañarlo a Él y también a quienes sufren cerca de ti: un enfermo, alguien solo, alguien que atraviesa su propio Getsemaní."],
+["Velen y oren para no caer en la tentación; el espíritu está pronto, pero la carne es débil.","Mt 26, 41","Jesús conoce nuestra fragilidad y no nos la reprocha: nos enseña el remedio. La oración perseverante es la que nos sostiene cuando las fuerzas fallan. Pide la gracia de no abandonar la oración, sobre todo cuando más cuesta."]]],
+["La Flagelación del Señor","la mortificación de los sentidos",[
+["Entonces Pilato tomó a Jesús y mandó azotarlo.","Jn 19, 1","Jesús, inocente, recibe en su cuerpo los golpes que merecía nuestro pecado. No responde con violencia, sino con amor. Contempla sus heridas en silencio y deja que su mansedumbre desarme el resentimiento que guardas en el corazón."],
+["Por sus llagas hemos sido curados.","Is 53, 5","Cada herida de Cristo es una puerta de sanación. Él conoce el dolor de tu cuerpo y de tu alma porque lo cargó primero. Pon hoy ante Él tus heridas y las de los que amas, y confía en que su amor puede sanarlas."],
+["Maltratado, él se humillaba y no abría la boca.","Is 53, 7","El silencio de Jesús no es debilidad: es una fortaleza que no necesita defenderse. Pídele dominio de ti mismo para no responder con dureza, y la gracia de ofrecer en silencio las pequeñas incomodidades de cada día."]]],
+["La Coronación de espinas","la humildad y el valor",[
+["Trenzaron una corona de espinas, se la pusieron en la cabeza y se burlaban de él.","Mt 27, 29","El Rey del universo es coronado con espinas y tratado como un loco. Jesús soporta la humillación por amor. Cuando te sientas despreciado o incomprendido, míralo a Él: no estás solo, y tu dignidad nadie te la puede arrebatar."],
+["Aquí tienen al hombre.","Jn 19, 5","Pilato presenta a Jesús desfigurado, y sin saberlo nos muestra el rostro del amor que no se rinde. En cada persona que sufre está ese mismo rostro. Pide ojos para reconocer a Cristo en los humillados de hoy."],
+["Mi reino no es de este mundo.","Jn 18, 36","Jesús no reina con poder ni con aplausos, sino sirviendo y entregándose. Su corona de espinas desenmascara nuestra búsqueda de reconocimiento. Pide un corazón humilde que busque agradar a Dios más que a los hombres."]]],
+["Jesús con la Cruz a cuestas camino del Calvario","la paciencia en las pruebas",[
+["Cargando él mismo con la cruz, salió hacia el lugar llamado de la Calavera.","Jn 19, 17","Jesús abraza la cruz y camina, aunque cae. No la rechaza: la transforma en camino de salvación. Ofrécele las cruces de tu día, grandes o pequeñas, y pídele la paciencia de seguir adelante aunque te cueste."],
+["El que quiera venir detrás de mí, que renuncie a sí mismo, cargue con su cruz y me siga.","Mt 16, 24","Seguir a Jesús no nos libra de la cruz, pero nos asegura que nunca la llevaremos solos. Él camina delante, abriendo el paso. Pídele que tu cruz de hoy no te aleje de Él, sino que te una más a su corazón."],
+["Tomaron a un tal Simón de Cirene y le cargaron la cruz para que la llevara detrás de Jesús.","Lc 23, 26","Simón no eligió ayudar, pero ese encuentro le cambió la vida. Dios pone a tu lado a personas que cargan cruces pesadas. Pregúntate de quién puedes ser hoy cireneo, aliviando su peso con tu presencia y tu ayuda."]]],
+["La Crucifixión y Muerte de Nuestro Señor","la perseverancia y el amor a la Cruz",[
+["Padre, perdónalos, porque no saben lo que hacen.","Lc 23, 34","Desde la cruz, la primera palabra de Jesús es perdón. Ama a quienes lo matan. Este misterio te invita a perdonar también tú, aunque duela, y a dejar en manos de Dios a quien te ha herido."],
+["Mujer, ahí tienes a tu hijo. Ahí tienes a tu madre.","Jn 19, 26-27","Antes de morir, Jesús nos entrega lo más querido que tenía: su Madre. Desde entonces, María nos acoge como hijos. Recíbela hoy en tu casa, como Juan, y confíale tu vida y a tu familia."],
+["Padre, en tus manos encomiendo mi espíritu.","Lc 23, 46","Jesús muere entregándose con confianza total al Padre. Su muerte no es derrota, sino el acto de amor más grande de la historia. Pide la gracia de vivir y de morir así: abandonado en las manos de Dios."]]]
+]},
+glo:{n:"Gloriosos",adj:"glorioso",l:[
+["La Resurrección del Hijo de Dios","la fe",[
+["¿Por qué buscan entre los muertos al que está vivo? No está aquí: ha resucitado.","Lc 24, 5-6","El sepulcro vacío es la mayor noticia de la historia: el amor es más fuerte que la muerte. Ninguna oscuridad tiene la última palabra. Deja que la luz de la Pascua entre hoy en aquello que creías perdido o muerto en tu vida."],
+["Jesús le dijo: ¡María! Ella se volvió y le dijo: ¡Rabbuní!","Jn 20, 16","María Magdalena lloraba y no lo reconocía, hasta que Jesús la llamó por su nombre. Así es el Resucitado: personal, cercano. Él también pronuncia tu nombre. Escúchalo en la oración y deja que su voz cambie tus lágrimas en alegría."],
+["¿No ardía nuestro corazón mientras nos hablaba por el camino?","Lc 24, 32","Los discípulos de Emaús caminaban desanimados, y Jesús caminaba con ellos sin que lo supieran. Lo reconocieron al partir el pan. Aun en tus días grises, Él camina a tu lado. Búscalo en su Palabra y en la Eucaristía."]]],
+["La Ascensión del Señor a los cielos","la esperanza",[
+["Yo estoy con ustedes todos los días, hasta el fin del mundo.","Mt 28, 20","Jesús sube al cielo, pero no nos abandona: está presente de otra manera, más cercana todavía. El cielo es nuestra meta, y Él nos prepara un lugar. Vive hoy con la mirada puesta en lo alto y los pies firmes en la tierra."],
+["Vayan por todo el mundo y anuncien el Evangelio a toda la creación.","Mc 16, 15","Antes de partir, Jesús confía su misión a hombres sencillos. Hoy te la confía a ti. No hace falta ir lejos: tu familia, tu trabajo y tus amigos son tu misión. Pide valor para dar testimonio con tu vida."],
+["Hombres de Galilea, ¿qué hacen ahí mirando al cielo?","Hch 1, 11","La esperanza del cielo no nos saca del mundo; nos compromete con él. Los ángeles invitan a los discípulos a ponerse en marcha. Que la certeza de la vida eterna te dé fuerzas para amar y servir aquí, ahora."]]],
+["La Venida del Espíritu Santo sobre María y los Apóstoles","el amor a Dios y los dones del Espíritu Santo",[
+["Todos quedaron llenos del Espíritu Santo.","Hch 2, 4","El Espíritu transforma a hombres temerosos en testigos valientes. Ese mismo fuego habita en ti desde tu bautismo y tu confirmación. Invócalo hoy: Ven, Espíritu Santo, llena mi corazón y enciende en mí el fuego de tu amor."],
+["Todos perseveraban unánimes en la oración, junto con María, la madre de Jesús.","Hch 1, 14","El Espíritu llega a una comunidad que ora unida, con María en el centro. Ella sigue reuniendo a la Iglesia en oración. Al rezar el Rosario, te unes a esa misma espera. Pide un nuevo Pentecostés para tu familia."],
+["El amor de Dios ha sido derramado en nuestros corazones por el Espíritu Santo.","Rm 5, 5","El Espíritu no es una idea lejana: es el Amor mismo de Dios viviendo en ti. Él consuela, ilumina y da fuerza. Pídele sus dones —sabiduría, fortaleza, consejo— para las decisiones y los retos de este día."]]],
+["La Asunción de María al cielo","la gracia de una buena muerte",[
+["Apareció en el cielo una gran señal: una mujer vestida de sol, con la luna bajo sus pies.","Ap 12, 1","María, llevada en cuerpo y alma al cielo, es la primera en llegar a donde todos estamos llamados. Ella nos muestra el final feliz del camino. Mira a tu Madre glorificada y deja que su victoria renueve tu esperanza."],
+["El Poderoso ha hecho obras grandes en mí; su nombre es santo.","Lc 1, 49","La gloria de María es obra de Dios en un corazón humilde. Lo que hizo en ella quiere hacerlo también en ti, si se lo permites. Pídele a la Virgen la gracia de vivir de tal modo que tu vida sea, también, una obra de Dios."],
+["Desde ahora me llamarán dichosa todas las generaciones.","Lc 1, 48","Al rezar el Rosario cumplimos esta profecía: llamamos dichosa a María. Ella, que ya está en el cielo, no se olvida de sus hijos en camino. Confíale la hora de tu muerte y la de quienes amas, para que los reciba en la casa del Padre."]]],
+["La Coronación de María como Reina de cielo y tierra","la perseverancia final",[
+["Y sobre su cabeza, una corona de doce estrellas.","Ap 12, 1","María es Reina porque fue la más humilde de las siervas. Su realeza es de Madre: intercede, protege y consuela. Ponte hoy bajo su manto y confíale aquello que más te preocupa."],
+["De pie, a tu derecha, está la reina, enjoyada con oro.","Sal 45, 10","La Reina del cielo está junto a su Hijo, y desde ahí no deja de mirar a la tierra. Su corona es también promesa para nosotros: la de compartir la gloria de Dios. Pide la gracia de perseverar en el bien hasta el final."],
+["Sé fiel hasta la muerte y te daré la corona de la vida.","Ap 2, 10","La corona de María es premio a una fidelidad de toda la vida, también en la cruz. A ti también te espera una corona. Pídele que te enseñe a ser fiel en lo pequeño, día tras día, hasta encontrarte con ella en el cielo."]]]
+]}
+};
+M.goz.sub="La infancia de Jesús";M.lum.sub="La vida pública de Jesús";M.dol.sub="La Pasión y muerte de Jesús";M.glo.sub="La Resurrección y la gloria de Cristo y María";
+function emblem(k){
+ const pt=(r,a)=>`${(60+r*Math.cos(a)).toFixed(1)},${(60+r*Math.sin(a)).toFixed(1)}`;
+ const st='stroke="var(--rose)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"',fl='fill="color-mix(in srgb,var(--rose) 22%,transparent)"';
+ const rays=(n,a,b)=>Array.from({length:n},(_,i)=>{const t=i*2*Math.PI/n;return`<line x1="${pt(a,t).split(",")[0]}" y1="${pt(a,t).split(",")[1]}" x2="${pt(b,t).split(",")[0]}" y2="${pt(b,t).split(",")[1]}" stroke="var(--rose)" stroke-opacity=".35" stroke-width="1.5"/>`}).join("");
+ let s="";
+ if(k==="goz"){s=rays(16,40,56)+`<polygon points="${Array.from({length:16},(_,i)=>pt(i%2?13:34,i*Math.PI/8-Math.PI/2)).join(" ")}" ${st} ${fl}/>`}
+ else if(k==="dol"){s=`<polyline points="${Array.from({length:49},(_,i)=>pt(i%2?36:44,i*Math.PI/24)).join(" ")}" fill="none" ${st}/><path d="M55 24h10v22h18v10H65v40H55V56H37V46h18z" ${st} ${fl}/>`}
+ else if(k==="lum"){s=rays(14,30,56)+`<path d="M60 22c12 16 14 28 0 44c-14-16-12-28 0-44z" ${st} ${fl}/><rect x="53" y="70" width="14" height="32" rx="3" ${st} ${fl}/>`}
+ else{s=Array.from({length:12},(_,i)=>{const t=Math.PI+(i+.5)*Math.PI/12;return`<circle cx="${pt(48,t).split(",")[0]}" cy="${pt(48,t).split(",")[1]}" r="3" fill="var(--rose)"/>`}).join("")+`<path d="M28 88l4-34l14 14l14-22l14 22l14-14l4 34z" ${st} ${fl}/><line x1="28" y1="96" x2="92" y2="96" ${st}/>`}
+ return`<svg viewBox="0 0 120 120" class="emb" aria-hidden="true">${s}</svg>`;
+}
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;let dir=1;
+const DAYS=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+const BYDAY=["glo","goz","dol","glo","lum","dol","goz"];
+const ORD=["Primer","Segundo","Tercer","Cuarto","Quinto"];
+const now=new Date(),today=now.getDay();
+const dayNum=Math.floor((now.getTime()-now.getTimezoneOffset()*60000)/86400000);
+const RI=dayNum%3;
+
+let st={set:BYDAY[today],cur:0,fat:true,jacs:[0,2],lit:false,mig:false,ps:20,int:"",date:now.toDateString()};
+try{const s=JSON.parse(localStorage.getItem("rosario3")||"null");if(s)st=Object.assign(st,s)}catch(e){}
+if(st.date!==now.toDateString()){st.date=now.toDateString();st.set=BYDAY[today];st.cur=0;st.int=""}
+const save=()=>{try{localStorage.setItem("rosario3",JSON.stringify(st))}catch(e){}};
+
+/* geometría del rosario */
+const G={},N=55,cx=150,cy=158,R=124;
+for(let i=0;i<N;i++){const a=Math.PI/2+i*2*Math.PI/N;G["p"+i]={x:cx+R*Math.cos(a),y:cy+R*Math.sin(a),r:i===0?0:(i%11===0?7.5:5)}}
+G.L2={x:150,y:316,r:7.5};G.s0={x:150,y:337,r:5};G.s1={x:150,y:354,r:5};G.s2={x:150,y:371,r:5};G.L1={x:150,y:393,r:7.5};
+
+let steps=[],first={},last={};
+function build(){
+ steps=[];const A=o=>steps.push(o);
+ A({b:"",k:"inicio",t:""});
+ A({b:"cross",k:"senal",t:"Señal de la cruz"});
+ A({b:"cross",k:"credo",t:"Credo"});
+ A({b:"L1",k:"pn",t:"Padre Nuestro"});
+ ["por la fe","por la esperanza","por la caridad"].forEach((v,i)=>A({b:"s"+i,k:"am",t:"Ave María",n:i+1,of:3,sub:v}));
+ A({b:"L2",k:"gloria",t:"Gloria",ini:1});
+ for(let d=0;d<5;d++){
+  const ann=d===0?"L2":"p"+11*d, gb=d<4?"p"+11*(d+1):"p0";
+  A({b:ann,k:"mist",d,t:ORD[d]+" misterio "+M[st.set].adj});
+  A({b:ann,k:"pn",t:"Padre Nuestro",d});
+  for(let j=0;j<10;j++)A({b:"p"+(1+11*d+j),k:"am",t:"Ave María",n:j+1,of:10,d});
+  A({b:gb,k:"gloria",t:"Gloria",d});
+ }
+ A({b:"p0",k:"salve",t:"La Salve"});
+ if(st.lit)A({b:"p0",k:"lit",t:"Letanías de la Virgen"});
+ A({b:"p0",k:"final",t:"Oración final"});
+ if(st.mig)A({b:"p0",k:"miguel",t:"Oración a San Miguel Arcángel"});
+ A({b:"cross",k:"senal",t:"Señal de la cruz",end:1});
+ first={};last={};
+ steps.forEach((s,i)=>{if(!s.b)return;if(!(s.b in first))first[s.b]=i;last[s.b]=i});
+ if(st.cur>steps.length)st.cur=steps.length;
+}
+
+const ros=document.getElementById("ros");
+function drawRosary(){
+ let h=`<defs><radialGradient id="pearl" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#e6ecfa"/><stop offset="1" stop-color="#a9b8de"/></radialGradient></defs>`;
+ for(let i=0;i<28;i++){const a=i*Math.PI/14;h+=`<line x1="${(cx+40*Math.cos(a)).toFixed(1)}" y1="${(cy+40*Math.sin(a)).toFixed(1)}" x2="${(cx+104*Math.cos(a)).toFixed(1)}" y2="${(cy+104*Math.sin(a)).toFixed(1)}" stroke="#fff" stroke-opacity="${i%2?.05:.1}" stroke-width="1"/>`}
+ h+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#9fb3e6" stroke-opacity=".45" stroke-width="1.2"/>`;
+ h+=`<line x1="150" y1="${cy+R}" x2="150" y2="412" stroke="#9fb3e6" stroke-opacity=".45" stroke-width="1.2"/>`;
+ for(const id in G){const g=G[id];if(!g.r)continue;
+  h+=`<circle class="ring" data-r="${id}" cx="${g.x.toFixed(1)}" cy="${g.y.toFixed(1)}" r="${g.r+5}"/>`;
+  h+=`<circle class="bead" data-b="${id}" cx="${g.x.toFixed(1)}" cy="${g.y.toFixed(1)}" r="${g.r}" fill="url(#pearl)"><title>Ir a esta cuenta</title></circle>`;}
+ const m=G.p0;
+ h+=`<ellipse class="ring" data-r="p0" cx="150" cy="${m.y}" rx="16" ry="20"/>`;
+ h+=`<g class="bead" data-b="p0"><ellipse cx="150" cy="${m.y}" rx="11" ry="14" fill="url(#pearl)" stroke="#c9d4f0" stroke-width="1.5"/><text x="150" y="${m.y+5}" text-anchor="middle" font-family="EB Garamond,serif" font-size="15" font-weight="600" fill="#1a3473">M</text><title>Medalla</title></g>`;
+ h+=`<rect class="ring" data-r="cross" x="128" y="404" width="44" height="72" rx="8"/>`;
+ h+=`<path class="bead" data-b="cross" d="M146 412h8v16h14v8h-14v34h-8v-34h-14v-8h14z" fill="url(#pearl)" stroke="#c9d4f0" stroke-width="1"><title>Crucifijo</title></path>`;
+ ros.innerHTML=h;
+}
+
+const card=document.getElementById("card"),bar=document.getElementById("bar");
+const paras=t=>t.split("\n").map(x=>`<p>${x}</p>`).join("");
+const fr=FR[dayNum%FR.length];
+const fraseHTML=`«${fr[0]}» <small>— ${fr[1]}</small>`;
+function body(s){
+ switch(s.k){
+  case"mist":{const [n,f,R3]=M[st.set].l[s.d];const [q,c,r]=R3[RI];
+   return`<p class="myst">${n}</p><div class="quote"><p>«${q}»</p><p class="cite">${c}</p></div><p class="lbl">Para meditar</p><p>${r}</p><p class="fruto">Fruto del misterio: ${f}.</p>`}
+  case"gloria":{let h=paras(P.gloria);
+   if(!s.ini&&st.fat)h+=`<hr><p class="lbl">Oración de Fátima</p>`+paras(P.fatima);
+   if(!s.ini&&st.jacs.length)h+=`<hr><p class="lbl">Jaculatorias</p>`+st.jacs.slice().sort().map(i=>`<p>${JAC[i]}</p>`).join("");
+   return h}
+  case"salve":return paras(P.salve)+`<p class="cite">℣. Ruega por nosotros, santa Madre de Dios.<br>℟. Para que seamos dignos de alcanzar las promesas de nuestro Señor Jesucristo. Amén.</p>`;
+  case"lit":return`<ul class="lit">${KY.map(([a,b])=>`<li>${a}<span>${b}</span></li>`).join("")}${LM.map(a=>`<li>${a}<span>ruega por nosotros</span></li>`).join("")}${AG.map(b=>`<li>Cordero de Dios, que quitas el pecado del mundo<span>${b}</span></li>`).join("")}</ul>`;
+  default:return paras(P[s.k]);
+ }
+}
+function meta(s){
+ let m="";
+ if(s.d!==undefined)m+=`Decena ${s.d+1} de 5`;
+ else if(s.end)m+="Para terminar";
+ else if(steps.indexOf(s)<8)m+="Oraciones iniciales";
+ else m+="Oraciones finales";
+ if(s.k==="mist")m+=" · Reflexión de hoy";
+ if(s.k==="am"){m+=` · ${s.n} de ${s.of}${s.sub?" — "+s.sub:""}`;
+  m+=`<span class="dots">${Array.from({length:s.of},(_,i)=>`<b class="${i<s.n?"f":""}"></b>`).join("")}</span>`}
+ return m;
+}
+function render(){
+ document.documentElement.style.setProperty("--ps",st.ps+"px");
+ document.getElementById("day").textContent=`${DAYS[today]} · Misterios ${M[st.set].n}`+(st.set!==BYDAY[today]?" (elegidos por ti)":"");
+ document.querySelectorAll("#sets button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===st.set));
+ document.getElementById("fat").checked=st.fat;document.getElementById("lit").checked=st.lit;document.getElementById("mig").checked=st.mig;
+ document.querySelectorAll("#jacs input").forEach(c=>c.checked=st.jacs.includes(+c.dataset.j));
+ const prev=document.getElementById("prev"),next=document.getElementById("next");
+ bar.style.width=(st.cur/steps.length*100)+"%";
+ const s=steps[st.cur];
+ document.querySelectorAll(".bead").forEach(e=>{const id=e.dataset.b;e.classList.remove("cur","up");
+  if(s&&id===s.b)e.classList.add("cur");else if(s&&(first[id]>st.cur||id==="cross"))e.classList.add("up")});
+ document.querySelectorAll(".ring").forEach(e=>e.classList.toggle("on",!!s&&e.dataset.r===s.b));
+ document.documentElement.dataset.set=st.set;
+ const anim=()=>{card.classList.remove("in-f","in-b");if(RM)return;void card.offsetWidth;card.classList.add(dir>0?"in-f":"in-b")};
+ if(!s){card.innerHTML=`<div class="done">${emblem(st.set)}<h2>Rosario completado</h2><p class="sub">Misterios ${M[st.set].n}</p><div class="txt" style="margin:18px auto 0"><p class="intent" id="intOut"></p><div class="quote"><p>«${fr[0]}»</p><p class="cite">${fr[1]}</p></div><p>Que la Virgen María te acompañe hoy y siempre.</p></div></div>`;
+  const io=document.getElementById("intOut");io.textContent=st.int.trim()?"Ofrecido por: "+st.int.trim():"";if(!st.int.trim())io.remove();
+  prev.disabled=false;next.textContent="Rezar de nuevo";anim();save();return}
+ if(s.k==="inicio"){const S=M[st.set];
+  card.innerHTML=`<div class="hero">${emblem(st.set)}<p class="meta" style="justify-content:center">${DAYS[today]}</p><h2>Misterios ${S.n}</h2><p class="sub">${S.sub}</p></div>
+  <div class="quote"><p>«${fr[0]}»</p><p class="cite">${fr[1]}</p></div>
+  <p class="lbl">Los cinco misterios</p>
+  <ol class="mlist">${S.l.map((m,i)=>`<li><button data-m="${i}"><b>${i+1}</b><span>${m[0]}</span></button></li>`).join("")}</ol>
+  <label class="lbl" for="int">Mi intención</label><input id="int" class="int" maxlength="160" placeholder="Por quién o por qué ofreces este Rosario">`;
+  document.getElementById("int").value=st.int;
+  prev.disabled=true;next.textContent="Comenzar el Rosario";anim();save();return}
+ card.innerHTML=`<div class="meta">${meta(s)}</div><h2>${s.t}</h2><div class="txt">${body(s)}</div>`;
+ prev.disabled=st.cur===0;
+ next.textContent=st.cur===steps.length-1?"Terminar":"Siguiente";
+ anim();save();
+}
+function go(i){i=Math.max(0,Math.min(steps.length,i));dir=i>=st.cur?1:-1;st.cur=i;render();
+ try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}
+ const t=card.getBoundingClientRect().top;if(t<0||t>innerHeight*.65)window.scrollTo({top:Math.max(0,scrollY+t-8),behavior:RM?"auto":"smooth"})}
+const nextFn=()=>{if(st.cur>=steps.length){dir=1;st.cur=0;render();window.scrollTo({top:0,behavior:RM?"auto":"smooth"});return}go(st.cur+1)};
+card.addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(b)go(steps.findIndex(s=>s.k==="mist"&&s.d===+b.dataset.m))});
+card.addEventListener("input",e=>{if(e.target.id==="int"){st.int=e.target.value;save()}});
+document.getElementById("sets").innerHTML=Object.keys(M).map(k=>`<button data-s="${k}">${M[k].n}</button>`).join("");
+document.getElementById("jacs").innerHTML=JAC.map((j,i)=>`<label class="tog"><input type="checkbox" data-j="${i}"> ${j.split(" — ")[0]}</label>`).join("");
+document.getElementById("sets").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.set=b.dataset.s;build();render()});
+document.getElementById("jacs").addEventListener("change",e=>{const j=+e.target.dataset.j;st.jacs=e.target.checked?[...new Set([...st.jacs,j])]:st.jacs.filter(x=>x!==j);render()});
+document.getElementById("fat").addEventListener("change",e=>{st.fat=e.target.checked;render()});
+document.getElementById("lit").addEventListener("change",e=>{st.lit=e.target.checked;build();render()});
+document.getElementById("mig").addEventListener("change",e=>{st.mig=e.target.checked;build();render()});
+document.getElementById("tm").addEventListener("click",()=>{st.ps=Math.max(16,st.ps-2);render()});
+document.getElementById("tp").addEventListener("click",()=>{st.ps=Math.min(32,st.ps+2);render()});
+document.getElementById("reset").addEventListener("click",()=>{st.cur=0;document.getElementById("set").open=false;render();window.scrollTo({top:0})});
+document.getElementById("next").addEventListener("click",nextFn);
+document.getElementById("prev").addEventListener("click",()=>go(st.cur>=steps.length?steps.length-1:st.cur-1));
+ros.addEventListener("click",e=>{const b=e.target.closest("[data-b]");if(b&&b.dataset.b in first)go(first[b.dataset.b])});
+document.addEventListener("keydown",e=>{if(e.target.closest("input,summary,.sheet"))return;
+ if(e.key==="ArrowRight"||e.key===" "){e.preventDefault();nextFn()}else if(e.key==="ArrowLeft"){e.preventDefault();if(st.cur>0)go(st.cur-1)}});
+let tx=null,ty=0;
+card.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+card.addEventListener("touchend",e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;
+ if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){dx<0?nextFn():(st.cur>0&&go(st.cur-1))}});
+
+build();drawRosary();render();
+}
+</script>
+</body>
+</html>
