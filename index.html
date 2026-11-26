@@ -68,7 +68,7 @@ h2{font:600 34px/1.05 "EB Garamond",serif;margin:6px 0 14px;text-wrap:balance}
 .cite{color:var(--soft)}
 .fruto{font:500 15px Figtree,sans-serif;color:var(--soft)}
 .lit{list-style:none;padding:0;margin:0}.lit li{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--line)}
-.lit li span{color:var(--soft);font-style:italic}
+.lit li>span.r{color:var(--soft);font-style:italic}
 .nav{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;padding:12px max(4vw,16px) calc(12px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line);z-index:5}
 .nav button{min-height:54px;border-radius:14px;border:1px solid var(--line);background:var(--chip);font-weight:600;font-size:17px}
 #prev{flex:1}#next{flex:2.4;background:var(--rose);border-color:var(--rose);color:#fff}
@@ -96,6 +96,8 @@ summary::-webkit-details-marker{display:none}
 #mic[aria-pressed=true]{background:var(--rose);border-color:var(--rose);color:#fff;animation:mp 1.6s ease-in-out infinite}
 @keyframes mp{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--rose) 25%,transparent)}}
 .duo .txt p.r{border-left:3px solid var(--rose);padding-left:12px}.duo .txt p.r::before{content:"Responden";display:block;font:600 12px/1.6 Figtree,sans-serif;color:var(--rose)}
+.txt .pr{font:500 .8em/1.5 Figtree,sans-serif;color:var(--soft);margin-top:-.5em}.txt .pr::before{content:"Se lee: ";font-weight:700;color:var(--rose)}.duo .txt p.r.pr::before{content:"Se lee: ";display:inline;font:inherit;font-weight:700}.duo .txt p.pr.r{border-left:0;padding-left:15px}
+.lit li.lx{display:block}.lit li.lx small{display:block}.lit li.lx em{font-style:italic;color:var(--soft)}.lit li.lx .pr{font:500 .8em/1.5 Figtree,sans-serif;color:var(--soft)}
 .txt .tr{font-size:.8em;color:var(--soft);font-style:italic;margin-top:-.45em}.lit .tr{flex-basis:100%;font-size:.8em;color:var(--soft);font-style:italic}
 .w{transition:color .25s,background .25s;border-radius:4px}.w.ok{color:var(--rose)}.w.now{background:color-mix(in srgb,var(--rose) 18%,transparent);box-shadow:0 2px 0 var(--rose)}
 #vstat{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;font-size:14px;line-height:1.35;width:max-content;max-width:92vw;text-align:center;opacity:0;pointer-events:none;transition:opacity .3s;z-index:6}#vstat.on{opacity:.94}
@@ -111,6 +113,7 @@ summary::-webkit-details-marker{display:none}
   <div class="sheet">
    <h3>Idioma de las oraciones</h3>
    <div class="chips" id="langs"><button data-l="es">Español</button><button data-l="la">Latín</button><button data-l="lab">Latín y español</button></div>
+   <label class="tog"><input type="checkbox" id="pron"> Mostrar debajo cómo se pronuncia el latín</label>
    <h3>Misterios</h3>
    <div class="chips" id="sets"></div>
    <h3>Después de cada decena</h3>
@@ -127,7 +130,7 @@ summary::-webkit-details-marker{display:none}
    <div class="chips"><button id="tm" aria-label="Texto más pequeño">A−</button><button id="tp" aria-label="Texto más grande">A+</button></div>
    <h3>Rosario</h3>
    <div class="chips"><button id="reset">Empezar de nuevo</button></div>
-   <p style="font-size:13px;color:var(--soft);margin:14px 0 0">Versión 6 · voz, latín y San Benito</p>
+   <p style="font-size:13px;color:var(--soft);margin:14px 0 0">Versión 7 · pronunciación del latín</p>
   </div>
  </details>
 </header>
@@ -164,6 +167,21 @@ final:"℣. Ora pro nobis, sancta Dei Genetrix.\n℟. Ut digni efficiamur promis
 benito:"Crux Sancti Patris Benedicti.\nCrux sacra sit mihi lux, non draco sit mihi dux.\nVade retro, Satana, numquam suade mihi vana; sunt mala quae libas, ipse venena bibas. Amen.",
 miguel:"Sancte Michael Archangele, defende nos in proelio; contra nequitiam et insidias diaboli esto praesidium.\nImperet illi Deus, supplices deprecamur: tuque, Princeps militiae caelestis, Satanam aliosque spiritus malignos, qui ad perditionem animarum pervagantur in mundo, divina virtute in infernum detrude. Amen."
 };
+const PP={
+senal:"Per síñum Sáncte Crúchis, de inimíchis nóstris líbera nos, Déus nóster.\nIn nómine Pátris, et Fílii, et Spíritus Sáncti. Amén.",
+credo:"Crédo in Déum, Pátrem omnipoténtem, Creatórem chéli et térre.\nEt in Yésum Crístum, Fílium éyus únicum, Dóminum nóstrum, cui conchéptus est de Spíritu Sáncto, nátus ex María Víryine, pásus sub Póntsio Piláto, cruchifíxus, mórtuus, et sepúltus, deshéndit ad ínferos, tértsia díe resurréxit a mórtuis, ashéndit ad chélos, sédet ad déxteram Déi Pátris omnipoténtis, índe ventúrus est yudicáre vívos et mórtuos.\nCrédo in Spíritum Sánctum, sánctam Eclésiam católicam, sanctórum comuniónem, remisiónem pecatórum, cárnis resurrectsiónem, vítam etérnam. Amén.",
+pn:"Páter nóster, cui es in chélis, sanctifichétur nómen túum. Advéniat réñum túum. Fíat volúntas túa, sícut in chélo et in térra.\nPánem nóstrum cuotidiánum da nóbis ódie, et dimíte nóbis débita nóstra, sícut et nos dimítimus debitóribus nóstris. Et ne nos indúcas in tentatsiónem, sed líbera nos a málo. Amén.",
+am:"Áve María, grátsia pléna, Dóminus técum. Benedícta tu in mulíeribus, et benedíctus frúctus véntris túi, Yésus.\nSáncta María, Máter Déi, óra pro nóbis pecatóribus, nunc et in óra mórtis nóstre. Amén.",
+gloria:"Glória Pátri, et Fílio, et Spiritúi Sáncto.\nSícut érat in princhípio, et nunc et sémper, et in sécula seculórum. Amén.",
+fatima:"O mi Yésu, dimíte nóbis débita nóstra, líbera nos ab íñe inférni, cónduc in chélum ómnes ánimas, presértim ílas cue máxime índiyent misericórdia túa. Amén.",
+salve:"Sálve, Reyína, Máter misericórdie, víta, dulchédo et spes nóstra, sálve.\nAd te clamámus, éxsules fílii Éve. Ad te suspirámus, yeméntes et fléntes in ac lacrimárum vále.\nÉya érgo, advocáta nóstra, ílos túos misericórdes óculos ad nos convérte. Et Yésum, benedíctum frúctum véntris túi, nóbis post oc exsílium osténde.\nO clémens, O pía, O dúlchis Vírgo María.",
+final:"℣. Óra pro nóbis, sáncta Déi Yenétrix.\n℟. Ut díñi efichiámur promisiónibus Crísti.\nOrémus. Déus, cúyus Uniyénitus per vítam, mórtem et resurrectsiónem súam nóbis salútis etérne prémia comparávit: conchéde, cuésumus, ut ec mistéria sanctísimo beáte Maríe Víryinis Rosário recoléntes, et imitémur cuod cóntinent, et cuod promítunt asecuámur. Per eúndem Crístum Dóminum nóstrum. Amén.",
+miguel:"Sáncte Mícael Arcányele, defénde nos in prélio; cóntra necuítsiam et insídias diáboli ésto presídium.\nÍmperet íli Déus, súpliches deprecámur: túcue, Príncheps milítsie cheléstis, Sátanam alióscue spíritus malíños, cui ad perditsiónem animárum pervagántur in múndo, divína virtúte in inférnum detrúde. Amén.",
+benito:"Crux Sáncti Pátris Benedícti.\nCrux sácra sit míki lux, non dráco sit míki dux.\nVáde rétro, Sátana, númcuam suáde míki vána; sunt mála cue líbas, ípse venéna bíbas. Amén."
+};
+const KYP=[["Kírie, eléison","Kírie, eléison"],["Kríste, eléison","Kríste, eléison"],["Kírie, eléison","Kírie, eléison"],["Kríste, áudi nos","Kríste, áudi nos"],["Kríste, exáudi nos","Kríste, exáudi nos"],["Páter de chélis, Déus","miserére nóbis"],["Fíli, Redémptor múndi, Déus","miserére nóbis"],["Spíritus Sáncte, Déus","miserére nóbis"],["Sáncta Trínitas, únus Déus","miserére nóbis"]];
+const LMP="Sáncta María|Sáncta Déi Yenétrix|Sáncta Vírgo víryinum|Máter Crísti|Máter Eclésie|Máter misericórdie|Máter divíne grátsie|Máter spéi|Máter purísima|Máter castísima|Máter invioláta|Máter intemeráta|Máter amábilis|Máter admirábilis|Máter bóni consílii|Máter Creatóris|Máter Salvatóris|Vírgo prudentísima|Vírgo veneránda|Vírgo predicánda|Vírgo pótens|Vírgo clémens|Vírgo fidélis|Spéculum yustítsie|Sédes sapiéntsie|Cáusa nóstre letítsie|Vas spirituále|Vas onorábile|Vas insíñe devotsiónis|Rósa mística|Túris Davídica|Túris ebúrnea|Dómus áurea|Féderis árca|Yánua chéli|Stéla matutína|Sálus infirmórum|Refúyium pecatórum|Soláchium migrántsium|Consolátrix aflictórum|Auxílium cristianórum|Reyína Anyelórum|Reyína Patriarcárum|Reyína Profetárum|Reyína Apostolórum|Reyína Mártirum|Reyína Confesórum|Reyína Víryinum|Reyína Sanctórum ómnium|Reyína síne lábe oriyinále conchépta|Reyína in chélum asúmpta|Reyína sanctísimi Rosárii|Reyína famílie|Reyína páchis".split("|");
+const AGP=["párche nóbis, Dómine","exáudi nos, Dómine","miserére nóbis"];
 const TL={senal:"Signum Crucis",credo:"Symbolum Apostolorum",pn:"Pater Noster",am:"Ave Maria",gloria:"Gloria Patri",salve:"Salve Regina",lit:"Litaniae Lauretanae",final:"Oratio",miguel:"Ad Sanctum Michaëlem",benito:"Crux Sancti Benedicti"};
 const KYL=[["Kyrie, eleison","Kyrie, eleison"],["Christe, eleison","Christe, eleison"],["Kyrie, eleison","Kyrie, eleison"],["Christe, audi nos","Christe, audi nos"],["Christe, exaudi nos","Christe, exaudi nos"],["Pater de caelis, Deus","miserere nobis"],["Fili, Redemptor mundi, Deus","miserere nobis"],["Spiritus Sancte, Deus","miserere nobis"],["Sancta Trinitas, unus Deus","miserere nobis"]];
 const LML="Sancta Maria|Sancta Dei Genetrix|Sancta Virgo virginum|Mater Christi|Mater Ecclesiae|Mater misericordiae|Mater divinae gratiae|Mater spei|Mater purissima|Mater castissima|Mater inviolata|Mater intemerata|Mater amabilis|Mater admirabilis|Mater boni consilii|Mater Creatoris|Mater Salvatoris|Virgo prudentissima|Virgo veneranda|Virgo praedicanda|Virgo potens|Virgo clemens|Virgo fidelis|Speculum iustitiae|Sedes sapientiae|Causa nostrae laetitiae|Vas spirituale|Vas honorabile|Vas insigne devotionis|Rosa mystica|Turris Davidica|Turris eburnea|Domus aurea|Foederis arca|Ianua caeli|Stella matutina|Salus infirmorum|Refugium peccatorum|Solacium migrantium|Consolatrix afflictorum|Auxilium christianorum|Regina Angelorum|Regina Patriarcharum|Regina Prophetarum|Regina Apostolorum|Regina Martyrum|Regina Confessorum|Regina Virginum|Regina Sanctorum omnium|Regina sine labe originali concepta|Regina in caelum assumpta|Regina sanctissimi Rosarii|Regina familiae|Regina pacis".split("|");
@@ -316,7 +334,7 @@ const now=new Date(),today=now.getDay();
 const dayNum=Math.floor((now.getTime()-now.getTimezoneOffset()*60000)/86400000);
 const RI=dayNum%3;
 
-let st={set:BYDAY[today],cur:0,fat:true,jacs:[0,2],lit:false,mig:false,ps:20,int:"",lang:"es",duo:false,rate:0.42,ben:false,date:now.toDateString()};
+let st={set:BYDAY[today],cur:0,fat:true,jacs:[0,2],lit:false,mig:false,ps:20,int:"",lang:"es",pron:true,duo:false,rate:0.42,ben:false,date:now.toDateString()};
 try{const s=JSON.parse(localStorage.getItem("rosario3")||"null");if(s)st=Object.assign(st,s)}catch(e){}
 if(st.date!==now.toDateString()){st.date=now.toDateString();st.set=BYDAY[today];st.cur=0;st.int=""}
 const save=()=>{try{localStorage.setItem("rosario3",JSON.stringify(st))}catch(e){}};
@@ -372,8 +390,9 @@ function drawRosary(){
 
 const card=document.getElementById("card"),bar=document.getElementById("bar");
 const paras=t=>t.split("\n").map(x=>`<p>${x}</p>`).join("");
-const T=k=>{const A=(st.lang==="es"?P:PL)[k].split("\n"),E=P[k].split("\n");
- return A.map((x,i)=>{const r=(["pn","am","gloria"].includes(k)&&i>0)||x.startsWith("℟");return`<p${r?' class="r"':""}>${x}</p>`+(st.lang==="lab"?`<p class="tr">${E[i]}</p>`:"")}).join("")};
+const T=k=>{const L=st.lang!=="es",A=(L?PL:P)[k].split("\n"),E=P[k].split("\n"),Q=PP[k].split("\n"),sp=L&&st.pron;
+ return A.map((x,i)=>{const r=(["pn","am","gloria"].includes(k)&&i>0)||x.startsWith("℟"),rc=r?" r":"";
+  return`<p class="${L?"la":""}${rc}${sp?" nt":""}">${x}</p>`+(sp?`<p class="pr${rc}">${Q[i]}</p>`:"")+(st.lang==="lab"?`<p class="tr">${E[i]}</p>`:"")}).join("")};
 const ttl=s=>st.lang!=="es"&&TL[s.k]?TL[s.k]+(st.lang==="lab"?` <small class="sub">· ${s.t}</small>`:""):s.t;
 const fr=FR[dayNum%FR.length];
 const fraseHTML=`«${fr[0]}» <small>— ${fr[1]}</small>`;
@@ -386,8 +405,9 @@ function body(s){
    if(!s.ini&&st.jacs.length)h+=`<hr><p class="lbl">Jaculatorias</p>`+st.jacs.slice().sort().map(i=>`<p>${JAC[i]}</p>`).join("");
    return h}
   case"salve":return T("salve")+(st.lang==="es"?`<p class="cite">℣. Ruega por nosotros, santa Madre de Dios.<br>℟. Para que seamos dignos de alcanzar las promesas de nuestro Señor Jesucristo. Amén.</p>`:`<p class="cite">℣. Ora pro nobis, sancta Dei Genetrix.<br>℟. Ut digni efficiamur promissionibus Christi. Amen.</p>`);
-  case"lit":{const L=st.lang!=="es",B=st.lang==="lab",li=(x,y,ex,ey)=>`<li>${x}<span class="r">${y}</span>${B?`<small class="tr">${ex} — ${ey}</small>`:""}</li>`;
-   return`<ul class="lit">${(L?KYL:KY).map((k,i)=>li(k[0],k[1],KY[i][0],KY[i][1])).join("")}${(L?LML:LM).map((x,i)=>li(x,L?"ora pro nobis":"ruega por nosotros",LM[i],"ruega por nosotros")).join("")}${(L?AGL:AG).map((x,i)=>li(L?"Agnus Dei, qui tollis peccata mundi":"Cordero de Dios, que quitas el pecado del mundo",x,"Cordero de Dios, que quitas el pecado del mundo",AG[i])).join("")}</ul>`}
+  case"lit":{const L=st.lang!=="es",B=st.lang==="lab",S=L&&st.pron;
+   const li=(x,y,px,py,ex,ey)=>L?`<li class="lx"><span${S?' class="nt"':""}>${x} — <em class="r">${y}</em></span>${S?`<small class="pr">${px} — <em class="r">${py}</em></small>`:""}${B?`<small class="tr">${ex} — ${ey}</small>`:""}</li>`:`<li>${x}<span class="r">${y}</span></li>`;
+   return`<ul class="lit">${KY.map((k,i)=>li(KYL[i][0],KYL[i][1],KYP[i][0],KYP[i][1],k[0],k[1])).join("")}${LM.map((x,i)=>L?li(LML[i],"ora pro nobis",LMP[i],"óra pro nóbis",x,"ruega por nosotros"):li(x,"ruega por nosotros")).join("")}${AG.map((x,i)=>L?li("Agnus Dei, qui tollis peccata mundi",AGL[i],"Áñus Déi, cui tólis pecáta múndi",AGP[i],"Cordero de Dios, que quitas el pecado del mundo",x):li("Cordero de Dios, que quitas el pecado del mundo",x)).join("")}</ul>`}
   default:return T(s.k);
  }
 }
@@ -409,6 +429,7 @@ function render(){
  document.getElementById("fat").checked=st.fat;document.getElementById("lit").checked=st.lit;document.getElementById("mig").checked=st.mig;document.getElementById("ben").checked=st.ben;
  document.querySelectorAll("#jacs input").forEach(c=>c.checked=st.jacs.includes(+c.dataset.j));
  document.querySelectorAll("#langs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===st.lang));
+ document.getElementById("pron").checked=st.pron;
  document.getElementById("duo").checked=st.duo;document.body.classList.toggle("duo",st.duo);
  document.querySelectorAll("#rates button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.r===st.rate));
  const prev=document.getElementById("prev"),next=document.getElementById("next");
@@ -446,6 +467,7 @@ document.getElementById("jacs").innerHTML=JAC.map((j,i)=>`<label class="tog"><in
 document.getElementById("sets").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.set=b.dataset.s;build();render()});
 document.getElementById("jacs").addEventListener("change",e=>{const j=+e.target.dataset.j;st.jacs=e.target.checked?[...new Set([...st.jacs,j])]:st.jacs.filter(x=>x!==j);render()});
 document.getElementById("langs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.lang=b.dataset.l;render()});
+document.getElementById("pron").addEventListener("change",e=>{st.pron=e.target.checked;render()});
 document.getElementById("duo").addEventListener("change",e=>{st.duo=e.target.checked;render()});
 document.getElementById("rates").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.rate=+b.dataset.r;render()});
 document.getElementById("fat").addEventListener("change",e=>{st.fat=e.target.checked;render()});
@@ -474,8 +496,8 @@ function lev(a,b){if(Math.abs(a.length-b.length)>1)return 9;const d=Array.from({
 const same=(a,b)=>a===b||(a.length>=4&&b.length>=4&&(lev(a,b)<=1||(a.length>=5&&b.length>=5&&a.slice(0,5)===b.slice(0,5))));
 function say(m,ms){clearTimeout(sayT);vstat.textContent=m;vstat.classList.toggle("on",!!m);if(m&&ms)sayT=setTimeout(()=>vstat.classList.remove("on"),ms)}
 function wrap(){W=[];const box=card.querySelector(".txt"),s=steps[st.cur];if(!box||!s||s.k==="inicio")return;
- box.querySelectorAll("p:not(.cite):not(.lbl):not(.fruto):not(.tr),li").forEach(el=>{const tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),ns=[];while(tw.nextNode())ns.push(tw.currentNode);
-  ns.forEach(t=>{if(t.parentElement.closest(".tr"))return;const rr=!!t.parentElement.closest(".r"),f=document.createDocumentFragment();t.textContent.split(/(\s+)/).forEach(k=>{if(!k)return;const n=nrm(k);if(!n){f.append(k);return}const sp=document.createElement("span");sp.className="w";sp.textContent=k;f.append(sp);W.push({el:sp,n,r:rr})});t.replaceWith(f)})})}
+ box.querySelectorAll("p:not(.cite):not(.lbl):not(.fruto):not(.tr):not(.nt),li").forEach(el=>{const tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),ns=[];while(tw.nextNode())ns.push(tw.currentNode);
+  ns.forEach(t=>{if(t.parentElement.closest(".tr,.nt"))return;const rr=!!t.parentElement.closest(".r"),f=document.createDocumentFragment();t.textContent.split(/(\s+)/).forEach(k=>{if(!k)return;const n=nrm(k);if(!n){f.append(k);return}const sp=document.createElement("span");sp.className="w";sp.textContent=k;f.append(sp);W.push({el:sp,n,r:rr})});t.replaceWith(f)})})}
 function paint(p){W.forEach((w,i)=>{w.el.classList.toggle("ok",i<p);w.el.classList.toggle("now",i===p)});const c=W[p]&&W[p].el;
  if(c){const r=c.getBoundingClientRect();if(r.bottom>innerHeight-120||r.top<70)window.scrollBy({top:r.top-innerHeight*.4,behavior:RM?"auto":"smooth"})}}
 function align(H){let p=0;for(const x of H){let j=p,c=0;const lim=x.length>=5?14:5;
