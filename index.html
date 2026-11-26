@@ -127,7 +127,7 @@ summary::-webkit-details-marker{display:none}
    <div class="chips"><button id="tm" aria-label="Texto más pequeño">A−</button><button id="tp" aria-label="Texto más grande">A+</button></div>
    <h3>Rosario</h3>
    <div class="chips"><button id="reset">Empezar de nuevo</button></div>
-   <p style="font-size:13px;color:var(--soft);margin:14px 0 0">Versión 5 · voz, latín y San Benito</p>
+   <p style="font-size:13px;color:var(--soft);margin:14px 0 0">Versión 6 · voz, latín y San Benito</p>
   </div>
  </details>
 </header>
@@ -488,7 +488,7 @@ function update(){if(!vOn||!W.length||st.cur>=steps.length)return;
  const lastR=st.duo&&W[W.length-1].r,done=pos>=W.length||(!lastR&&pos>=W.length-1);
  if(W.length>2&&done&&!advT)advT=setTimeout(()=>{advT=null;if(vOn)nextFn()},lastR?900:650)}
 function onRes(e){let t="";for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript+" ";lastH=t.split(/\s+/).map(nrm).filter(Boolean);update()}
-function startV(){if(!SR){say("Este navegador no permite reconocer la voz. Usa Chrome o Safari actualizados.",6000);return}
+function startV(){const sa=navigator.standalone||matchMedia("(display-mode: standalone)").matches;if(!SR){say(sa?"Desde el ícono de inicio el iPhone no permite usar la voz. Ábrela en Safari para rezar con la voz.":"Este navegador no permite reconocer la voz. Usa Chrome o Safari actualizados.",7000);return}
  rec=new SR();rec.lang="es-CO";rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=1;
  rec.onresult=onRes;
  rec.onerror=e=>{const m={"not-allowed":"No hay permiso para el micrófono. Ábrela desde tu link de GitHub y permite el micrófono.","service-not-allowed":"No hay permiso para el micrófono. Ábrela desde tu link de GitHub y permite el micrófono.","audio-capture":"No se encontró un micrófono.","network":"El reconocimiento de voz necesita conexión a internet."}[e.error];if(m){stopV();say(m,7000)}};
