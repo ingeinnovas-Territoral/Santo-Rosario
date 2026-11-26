@@ -96,6 +96,7 @@ summary::-webkit-details-marker{display:none}
 #mic[aria-pressed=true]{background:var(--rose);border-color:var(--rose);color:#fff;animation:mp 1.6s ease-in-out infinite}
 @keyframes mp{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--rose) 25%,transparent)}}
 .duo .txt p.r{border-left:3px solid var(--rose);padding-left:12px}.duo .txt p.r::before{content:"Responden";display:block;font:600 12px/1.6 Figtree,sans-serif;color:var(--rose)}
+.txt .tr{font-size:.8em;color:var(--soft);font-style:italic;margin-top:-.45em}.lit .tr{flex-basis:100%;font-size:.8em;color:var(--soft);font-style:italic}
 .w{transition:color .25s,background .25s;border-radius:4px}.w.ok{color:var(--rose)}.w.now{background:color-mix(in srgb,var(--rose) 18%,transparent);box-shadow:0 2px 0 var(--rose)}
 #vstat{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;font-size:14px;line-height:1.35;width:max-content;max-width:92vw;text-align:center;opacity:0;pointer-events:none;transition:opacity .3s;z-index:6}#vstat.on{opacity:.94}
 @media(prefers-reduced-motion:reduce){#mic[aria-pressed=true]{animation:none}.ring.on{animation:none}.prog i,.bead{transition:none}}
@@ -108,6 +109,8 @@ summary::-webkit-details-marker{display:none}
  <details class="set" id="set">
   <summary>Ajustes</summary>
   <div class="sheet">
+   <h3>Idioma de las oraciones</h3>
+   <div class="chips" id="langs"><button data-l="es">Español</button><button data-l="la">Latín</button><button data-l="lab">Latín y español</button></div>
    <h3>Misterios</h3>
    <div class="chips" id="sets"></div>
    <h3>Después de cada decena</h3>
@@ -116,6 +119,7 @@ summary::-webkit-details-marker{display:none}
    <h3>Al final del Rosario</h3>
    <label class="tog"><input type="checkbox" id="lit"> Letanías de la Virgen</label>
    <label class="tog"><input type="checkbox" id="mig"> Oración a San Miguel Arcángel</label>
+   <label class="tog"><input type="checkbox" id="ben"> Oración de San Benito</label>
    <h3>Rezar con la voz</h3>
    <label class="tog"><input type="checkbox" id="duo"> Rezo acompañado: yo dirijo y otra persona responde</label>
    <div class="chips" id="rates"><button data-r="0.55">Respuesta pausada</button><button data-r="0.42">Normal</button><button data-r="0.33">Ágil</button></div>
@@ -144,8 +148,25 @@ gloria:"Gloria al Padre, y al Hijo, y al Espíritu Santo.\nComo era en el princi
 fatima:"Oh Jesús mío, perdona nuestros pecados, líbranos del fuego del infierno, lleva al cielo a todas las almas, y socorre especialmente a las más necesitadas de tu misericordia. Amén.",
 salve:"Dios te salve, Reina y Madre de misericordia, vida, dulzura y esperanza nuestra; Dios te salve.\nA ti llamamos los desterrados hijos de Eva; a ti suspiramos, gimiendo y llorando en este valle de lágrimas.\nEa, pues, Señora, abogada nuestra, vuelve a nosotros esos tus ojos misericordiosos; y después de este destierro muéstranos a Jesús, fruto bendito de tu vientre.\n¡Oh clementísima, oh piadosa, oh dulce Virgen María!",
 final:"℣. Ruega por nosotros, santa Madre de Dios.\n℟. Para que seamos dignos de alcanzar las promesas de nuestro Señor Jesucristo.\nOremos: Oh Dios, cuyo Hijo unigénito, con su vida, muerte y resurrección, nos alcanzó el premio de la vida eterna; concédenos, te rogamos, que meditando estos misterios del santísimo Rosario de la Virgen María, imitemos lo que contienen y alcancemos lo que prometen. Por el mismo Cristo nuestro Señor. Amén.",
+benito:"Cruz del Santo Padre Benito.\nLa Cruz santa sea mi luz, no sea el demonio mi guía.\n¡Apártate, Satanás! No me sugieras cosas vanas; malo es lo que me ofreces, bebe tú mismo tu veneno. Amén.",
 miguel:"San Miguel Arcángel, defiéndenos en la lucha; sé nuestro amparo contra la perversidad y asechanzas del demonio.\nReprímale Dios, pedimos suplicantes; y tú, Príncipe de la milicia celestial, arroja al infierno con el divino poder a Satanás y a los otros espíritus malignos que andan dispersos por el mundo para la perdición de las almas. Amén."
 };
+const PL={
+senal:"Per signum Sanctae Crucis, de inimicis nostris libera nos, Deus noster.\nIn nomine Patris, et Filii, et Spiritus Sancti. Amen.",
+credo:"Credo in Deum, Patrem omnipotentem, Creatorem caeli et terrae.\nEt in Iesum Christum, Filium eius unicum, Dominum nostrum, qui conceptus est de Spiritu Sancto, natus ex Maria Virgine, passus sub Pontio Pilato, crucifixus, mortuus, et sepultus, descendit ad inferos, tertia die resurrexit a mortuis, ascendit ad caelos, sedet ad dexteram Dei Patris omnipotentis, inde venturus est iudicare vivos et mortuos.\nCredo in Spiritum Sanctum, sanctam Ecclesiam catholicam, sanctorum communionem, remissionem peccatorum, carnis resurrectionem, vitam aeternam. Amen.",
+pn:"Pater noster, qui es in caelis, sanctificetur nomen tuum. Adveniat regnum tuum. Fiat voluntas tua, sicut in caelo et in terra.\nPanem nostrum quotidianum da nobis hodie, et dimitte nobis debita nostra, sicut et nos dimittimus debitoribus nostris. Et ne nos inducas in tentationem, sed libera nos a malo. Amen.",
+am:"Ave Maria, gratia plena, Dominus tecum. Benedicta tu in mulieribus, et benedictus fructus ventris tui, Iesus.\nSancta Maria, Mater Dei, ora pro nobis peccatoribus, nunc et in hora mortis nostrae. Amen.",
+gloria:"Gloria Patri, et Filio, et Spiritui Sancto.\nSicut erat in principio, et nunc et semper, et in saecula saeculorum. Amen.",
+fatima:"O mi Iesu, dimitte nobis debita nostra, libera nos ab igne inferni, conduc in caelum omnes animas, praesertim illas quae maxime indigent misericordia tua. Amen.",
+salve:"Salve, Regina, Mater misericordiae, vita, dulcedo et spes nostra, salve.\nAd te clamamus, exsules filii Hevae. Ad te suspiramus, gementes et flentes in hac lacrimarum valle.\nEia ergo, advocata nostra, illos tuos misericordes oculos ad nos converte. Et Iesum, benedictum fructum ventris tui, nobis post hoc exsilium ostende.\nO clemens, O pia, O dulcis Virgo Maria.",
+final:"℣. Ora pro nobis, sancta Dei Genetrix.\n℟. Ut digni efficiamur promissionibus Christi.\nOremus. Deus, cuius Unigenitus per vitam, mortem et resurrectionem suam nobis salutis aeternae praemia comparavit: concede, quaesumus, ut haec mysteria sanctissimo beatae Mariae Virginis Rosario recolentes, et imitemur quod continent, et quod promittunt assequamur. Per eundem Christum Dominum nostrum. Amen.",
+benito:"Crux Sancti Patris Benedicti.\nCrux sacra sit mihi lux, non draco sit mihi dux.\nVade retro, Satana, numquam suade mihi vana; sunt mala quae libas, ipse venena bibas. Amen.",
+miguel:"Sancte Michael Archangele, defende nos in proelio; contra nequitiam et insidias diaboli esto praesidium.\nImperet illi Deus, supplices deprecamur: tuque, Princeps militiae caelestis, Satanam aliosque spiritus malignos, qui ad perditionem animarum pervagantur in mundo, divina virtute in infernum detrude. Amen."
+};
+const TL={senal:"Signum Crucis",credo:"Symbolum Apostolorum",pn:"Pater Noster",am:"Ave Maria",gloria:"Gloria Patri",salve:"Salve Regina",lit:"Litaniae Lauretanae",final:"Oratio",miguel:"Ad Sanctum Michaëlem",benito:"Crux Sancti Benedicti"};
+const KYL=[["Kyrie, eleison","Kyrie, eleison"],["Christe, eleison","Christe, eleison"],["Kyrie, eleison","Kyrie, eleison"],["Christe, audi nos","Christe, audi nos"],["Christe, exaudi nos","Christe, exaudi nos"],["Pater de caelis, Deus","miserere nobis"],["Fili, Redemptor mundi, Deus","miserere nobis"],["Spiritus Sancte, Deus","miserere nobis"],["Sancta Trinitas, unus Deus","miserere nobis"]];
+const LML="Sancta Maria|Sancta Dei Genetrix|Sancta Virgo virginum|Mater Christi|Mater Ecclesiae|Mater misericordiae|Mater divinae gratiae|Mater spei|Mater purissima|Mater castissima|Mater inviolata|Mater intemerata|Mater amabilis|Mater admirabilis|Mater boni consilii|Mater Creatoris|Mater Salvatoris|Virgo prudentissima|Virgo veneranda|Virgo praedicanda|Virgo potens|Virgo clemens|Virgo fidelis|Speculum iustitiae|Sedes sapientiae|Causa nostrae laetitiae|Vas spirituale|Vas honorabile|Vas insigne devotionis|Rosa mystica|Turris Davidica|Turris eburnea|Domus aurea|Foederis arca|Ianua caeli|Stella matutina|Salus infirmorum|Refugium peccatorum|Solacium migrantium|Consolatrix afflictorum|Auxilium christianorum|Regina Angelorum|Regina Patriarcharum|Regina Prophetarum|Regina Apostolorum|Regina Martyrum|Regina Confessorum|Regina Virginum|Regina Sanctorum omnium|Regina sine labe originali concepta|Regina in caelum assumpta|Regina sanctissimi Rosarii|Regina familiae|Regina pacis".split("|");
+const AGL=["parce nobis, Domine","exaudi nos, Domine","miserere nobis"];
 const JAC=[
 "María, Madre de gracia, Madre de misericordia, en la vida y en la muerte ampáranos, oh gran Señora.",
 "Ave María Purísima. — Sin pecado concebida.",
@@ -294,7 +315,7 @@ const now=new Date(),today=now.getDay();
 const dayNum=Math.floor((now.getTime()-now.getTimezoneOffset()*60000)/86400000);
 const RI=dayNum%3;
 
-let st={set:BYDAY[today],cur:0,fat:true,jacs:[0,2],lit:false,mig:false,ps:20,int:"",duo:false,rate:0.42,date:now.toDateString()};
+let st={set:BYDAY[today],cur:0,fat:true,jacs:[0,2],lit:false,mig:false,ps:20,int:"",lang:"es",duo:false,rate:0.42,ben:false,date:now.toDateString()};
 try{const s=JSON.parse(localStorage.getItem("rosario3")||"null");if(s)st=Object.assign(st,s)}catch(e){}
 if(st.date!==now.toDateString()){st.date=now.toDateString();st.set=BYDAY[today];st.cur=0;st.int=""}
 const save=()=>{try{localStorage.setItem("rosario3",JSON.stringify(st))}catch(e){}};
@@ -324,6 +345,7 @@ function build(){
  if(st.lit)A({b:"p0",k:"lit",t:"Letanías de la Virgen"});
  A({b:"p0",k:"final",t:"Oración final"});
  if(st.mig)A({b:"p0",k:"miguel",t:"Oración a San Miguel Arcángel"});
+ if(st.ben)A({b:"p0",k:"benito",t:"Oración de San Benito"});
  A({b:"cross",k:"senal",t:"Señal de la cruz",end:1});
  first={};last={};
  steps.forEach((s,i)=>{if(!s.b)return;if(!(s.b in first))first[s.b]=i;last[s.b]=i});
@@ -349,22 +371,23 @@ function drawRosary(){
 
 const card=document.getElementById("card"),bar=document.getElementById("bar");
 const paras=t=>t.split("\n").map(x=>`<p>${x}</p>`).join("");
-const pr=t=>t.split("\n").map((x,i)=>`<p${i?' class="r"':""}>${x}</p>`).join("");
+const T=k=>{const A=(st.lang==="es"?P:PL)[k].split("\n"),E=P[k].split("\n");
+ return A.map((x,i)=>{const r=(["pn","am","gloria"].includes(k)&&i>0)||x.startsWith("℟");return`<p${r?' class="r"':""}>${x}</p>`+(st.lang==="lab"?`<p class="tr">${E[i]}</p>`:"")}).join("")};
+const ttl=s=>st.lang!=="es"&&TL[s.k]?TL[s.k]+(st.lang==="lab"?` <small class="sub">· ${s.t}</small>`:""):s.t;
 const fr=FR[dayNum%FR.length];
 const fraseHTML=`«${fr[0]}» <small>— ${fr[1]}</small>`;
 function body(s){
  switch(s.k){
   case"mist":{const [n,f,R3]=M[st.set].l[s.d];const [q,c,r]=R3[RI];
    return`<p class="myst">${n}</p><div class="quote"><p>«${q}»</p><p class="cite">${c}</p></div><p class="lbl">Para meditar</p><p>${r}</p><p class="fruto">Fruto del misterio: ${f}.</p>`}
-  case"gloria":{let h=pr(P.gloria);
-   if(!s.ini&&st.fat)h+=`<hr><p class="lbl">Oración de Fátima</p>`+paras(P.fatima);
+  case"gloria":{let h=T("gloria");
+   if(!s.ini&&st.fat)h+=`<hr><p class="lbl">Oración de Fátima</p>`+T("fatima");
    if(!s.ini&&st.jacs.length)h+=`<hr><p class="lbl">Jaculatorias</p>`+st.jacs.slice().sort().map(i=>`<p>${JAC[i]}</p>`).join("");
    return h}
-  case"salve":return paras(P.salve)+`<p class="cite">℣. Ruega por nosotros, santa Madre de Dios.<br>℟. Para que seamos dignos de alcanzar las promesas de nuestro Señor Jesucristo. Amén.</p>`;
-  case"lit":return`<ul class="lit">${KY.map(([a,b])=>`<li>${a}<span class="r">${b}</span></li>`).join("")}${LM.map(a=>`<li>${a}<span class="r">ruega por nosotros</span></li>`).join("")}${AG.map(b=>`<li>Cordero de Dios, que quitas el pecado del mundo<span class="r">${b}</span></li>`).join("")}</ul>`;
-  case"pn":case"am":return pr(P[s.k]);
-  case"final":return P.final.split("\n").map(x=>`<p${x.startsWith("℟")?' class="r"':""}>${x}</p>`).join("");
-  default:return paras(P[s.k]);
+  case"salve":return T("salve")+(st.lang==="es"?`<p class="cite">℣. Ruega por nosotros, santa Madre de Dios.<br>℟. Para que seamos dignos de alcanzar las promesas de nuestro Señor Jesucristo. Amén.</p>`:`<p class="cite">℣. Ora pro nobis, sancta Dei Genetrix.<br>℟. Ut digni efficiamur promissionibus Christi. Amen.</p>`);
+  case"lit":{const L=st.lang!=="es",B=st.lang==="lab",li=(x,y,ex,ey)=>`<li>${x}<span class="r">${y}</span>${B?`<small class="tr">${ex} — ${ey}</small>`:""}</li>`;
+   return`<ul class="lit">${(L?KYL:KY).map((k,i)=>li(k[0],k[1],KY[i][0],KY[i][1])).join("")}${(L?LML:LM).map((x,i)=>li(x,L?"ora pro nobis":"ruega por nosotros",LM[i],"ruega por nosotros")).join("")}${(L?AGL:AG).map((x,i)=>li(L?"Agnus Dei, qui tollis peccata mundi":"Cordero de Dios, que quitas el pecado del mundo",x,"Cordero de Dios, que quitas el pecado del mundo",AG[i])).join("")}</ul>`}
+  default:return T(s.k);
  }
 }
 function meta(s){
@@ -382,8 +405,9 @@ function render(){
  document.documentElement.style.setProperty("--ps",st.ps+"px");
  document.getElementById("day").textContent=`${DAYS[today]} · Misterios ${M[st.set].n}`+(st.set!==BYDAY[today]?" (elegidos por ti)":"");
  document.querySelectorAll("#sets button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===st.set));
- document.getElementById("fat").checked=st.fat;document.getElementById("lit").checked=st.lit;document.getElementById("mig").checked=st.mig;
+ document.getElementById("fat").checked=st.fat;document.getElementById("lit").checked=st.lit;document.getElementById("mig").checked=st.mig;document.getElementById("ben").checked=st.ben;
  document.querySelectorAll("#jacs input").forEach(c=>c.checked=st.jacs.includes(+c.dataset.j));
+ document.querySelectorAll("#langs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===st.lang));
  document.getElementById("duo").checked=st.duo;document.body.classList.toggle("duo",st.duo);
  document.querySelectorAll("#rates button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.r===st.rate));
  const prev=document.getElementById("prev"),next=document.getElementById("next");
@@ -405,7 +429,7 @@ function render(){
   <label class="lbl" for="int">Mi intención</label><input id="int" class="int" maxlength="160" placeholder="Por quién o por qué ofreces este Rosario">`;
   document.getElementById("int").value=st.int;
   prev.disabled=true;next.textContent="Comenzar el Rosario";anim();save();return}
- card.innerHTML=`<div class="meta">${meta(s)}</div><h2>${s.t}</h2><div class="txt">${body(s)}</div>`;
+ card.innerHTML=`<div class="meta">${meta(s)}</div><h2>${ttl(s)}</h2><div class="txt">${body(s)}</div>`;
  prev.disabled=st.cur===0;
  next.textContent=st.cur===steps.length-1?"Terminar":"Siguiente";
  anim();save();
@@ -420,10 +444,12 @@ document.getElementById("sets").innerHTML=Object.keys(M).map(k=>`<button data-s=
 document.getElementById("jacs").innerHTML=JAC.map((j,i)=>`<label class="tog"><input type="checkbox" data-j="${i}"> ${j.split(" — ")[0]}</label>`).join("");
 document.getElementById("sets").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.set=b.dataset.s;build();render()});
 document.getElementById("jacs").addEventListener("change",e=>{const j=+e.target.dataset.j;st.jacs=e.target.checked?[...new Set([...st.jacs,j])]:st.jacs.filter(x=>x!==j);render()});
+document.getElementById("langs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.lang=b.dataset.l;render()});
 document.getElementById("duo").addEventListener("change",e=>{st.duo=e.target.checked;render()});
 document.getElementById("rates").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.rate=+b.dataset.r;render()});
 document.getElementById("fat").addEventListener("change",e=>{st.fat=e.target.checked;render()});
 document.getElementById("lit").addEventListener("change",e=>{st.lit=e.target.checked;build();render()});
+document.getElementById("ben").addEventListener("change",e=>{st.ben=e.target.checked;build();render()});
 document.getElementById("mig").addEventListener("change",e=>{st.mig=e.target.checked;build();render()});
 document.getElementById("tm").addEventListener("click",()=>{st.ps=Math.max(16,st.ps-2);render()});
 document.getElementById("tp").addEventListener("click",()=>{st.ps=Math.min(32,st.ps+2);render()});
@@ -447,8 +473,8 @@ function lev(a,b){if(Math.abs(a.length-b.length)>1)return 9;const d=Array.from({
 const same=(a,b)=>a===b||(a.length>=4&&b.length>=4&&(lev(a,b)<=1||(a.length>=5&&b.length>=5&&a.slice(0,5)===b.slice(0,5))));
 function say(m,ms){clearTimeout(sayT);vstat.textContent=m;vstat.classList.toggle("on",!!m);if(m&&ms)sayT=setTimeout(()=>vstat.classList.remove("on"),ms)}
 function wrap(){W=[];const box=card.querySelector(".txt"),s=steps[st.cur];if(!box||!s||s.k==="inicio")return;
- box.querySelectorAll("p:not(.cite):not(.lbl):not(.fruto),li").forEach(el=>{const tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),ns=[];while(tw.nextNode())ns.push(tw.currentNode);
-  ns.forEach(t=>{const rr=!!t.parentElement.closest(".r"),f=document.createDocumentFragment();t.textContent.split(/(\s+)/).forEach(k=>{if(!k)return;const n=nrm(k);if(!n){f.append(k);return}const sp=document.createElement("span");sp.className="w";sp.textContent=k;f.append(sp);W.push({el:sp,n,r:rr})});t.replaceWith(f)})})}
+ box.querySelectorAll("p:not(.cite):not(.lbl):not(.fruto):not(.tr),li").forEach(el=>{const tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),ns=[];while(tw.nextNode())ns.push(tw.currentNode);
+  ns.forEach(t=>{if(t.parentElement.closest(".tr"))return;const rr=!!t.parentElement.closest(".r"),f=document.createDocumentFragment();t.textContent.split(/(\s+)/).forEach(k=>{if(!k)return;const n=nrm(k);if(!n){f.append(k);return}const sp=document.createElement("span");sp.className="w";sp.textContent=k;f.append(sp);W.push({el:sp,n,r:rr})});t.replaceWith(f)})})}
 function paint(p){W.forEach((w,i)=>{w.el.classList.toggle("ok",i<p);w.el.classList.toggle("now",i===p)});const c=W[p]&&W[p].el;
  if(c){const r=c.getBoundingClientRect();if(r.bottom>innerHeight-120||r.top<70)window.scrollBy({top:r.top-innerHeight*.4,behavior:RM?"auto":"smooth"})}}
 function align(H){let p=0;for(const x of H){let j=p,c=0;const lim=x.length>=5?14:5;
